@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Ultimate Compliment Machine</title>
+    <title>The Ultimate Mood Card</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,14 +17,15 @@
         }
 
         body {
-            /* Animated Gradient Background */
-            background: linear-gradient(-45deg, #FF6B6B, #FFD166, #4ECDC4, #45B7D1);
+            /* Animated Mesh Gradient Background */
+            background: linear-gradient(45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
             color: #212529;
             font-family: 'Lato', sans-serif;
             height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             overflow: hidden;
@@ -37,166 +38,178 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* --- Floating Particles --- */
-        .sparkle {
-            position: absolute;
-            pointer-events: none;
-            z-index: 0;
-            animation: float 4s ease-in infinite;
-            opacity: 0;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
-        }
-
-        /* --- Vertical Layout Container --- */
-        .app-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            width: 100%;
-            max-width: 400px; /* Thinner, vertical profile */
-            min-height: 550px;
-            padding: 3rem 2rem;
-            border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-            text-align: center;
+        /* --- Playing Card Container --- */
+        .playing-card {
+            background: #ffffff;
+            width: 350px;  /* Standard Playing Card Ratio */
+            height: 490px;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            position: relative;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            position: relative;
-            z-index: 1;
-            border: 4px solid #ffffff;
+            padding: 40px;
+            text-align: center;
+            border: 8px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            perspective: 1000px;
+            z-index: 2;
         }
 
-        /* --- Visual Flourish --- */
-        .icon-header {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+        .playing-card:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(-5deg);
         }
 
-        /* --- Compliment Display --- */
-        .display-area {
-            flex-grow: 1;
+        /* --- Card Pips (Corners) --- */
+        .corner-pip {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 2rem 0;
+            font-size: 1.5rem;
+            color: white;
+            transition: background-color 0.5s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        #compliment-text {
+        .top-right { top: 15px; right: 15px; }
+        .bottom-left { bottom: 15px; left: 15px; }
+
+        /* --- Text Content --- */
+        .content-area {
+            max-height: 80%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        #display-text {
             font-family: 'Nunito', sans-serif;
             font-size: 1.8rem;
-            line-height: 1.3;
             font-weight: 800;
-            color: #212529;
-            background: linear-gradient(120deg, #FF6B6B, #FF8E53);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #333;
         }
 
-        /* Animation class for new text */
-        .pop-in {
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        @keyframes popIn {
-            0% { opacity: 0; transform: scale(0.5) rotate(-5deg); }
-            100% { opacity: 1; transform: scale(1) rotate(0deg); }
-        }
-
-        /* --- Button Styling --- */
-        .btn-generate {
-            background: #FF6B6B;
-            color: #ffffff;
-            border: none;
-            width: 100%;
-            padding: 1.2rem;
-            font-size: 1.2rem;
+        #punchline-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.4rem;
+            color: #FF6B6B;
             font-weight: 700;
-            text-transform: uppercase;
-            border-radius: 20px;
+            font-style: italic;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+        }
+
+        #punchline-text.reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Buttons Container (Outside Card) --- */
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            max-width: 350px;
+            z-index: 2;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 0 #D64545;
-            position: relative;
-            top: 0;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        .btn-generate:hover {
-            background: #FF8E53;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 0 #D64545;
+        .btn-compliment { background: #FF6B6B; }
+        .btn-joke { background: #4ECDC4; }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
         }
 
-        .btn-generate:active {
-            top: 6px;
-            box-shadow: 0 2px 0 #D64545;
+        .btn:active {
+            transform: translateY(1px);
         }
 
-        /* --- Confetti Elements --- */
-        .emoji-burst {
+        /* --- Animations --- */
+        .flip-anim {
+            animation: cardFlip 0.6s ease-out;
+        }
+
+        @keyframes cardFlip {
+            0% { transform: scale(1) rotateY(0); }
+            50% { transform: scale(1.05) rotateY(90deg); }
+            100% { transform: scale(1) rotateY(0); }
+        }
+
+        /* Floating Background Particles */
+        .particle {
             position: absolute;
-            font-size: 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
             pointer-events: none;
-            animation: burst 0.8s ease-out forwards;
-        }
-
-        @keyframes burst {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
-        }
-
-        /* --- Responsive --- */
-        @media (max-width: 400px) {
-            .app-container {
-                min-height: 480px;
-                padding: 2rem 1.5rem;
-            }
-            #compliment-text { font-size: 1.5rem; }
+            z-index: 1;
         }
     </style>
 </head>
 <body>
 
-    <main class="app-container">
-        <div class="icon-header">✨</div>
+    <main class="playing-card" id="card">
+        <!-- Corner Pips -->
+        <div class="corner-pip top-right" id="pip-tr">✨</div>
+        <div class="corner-pip bottom-left" id="pip-bl">✨</div>
         
-        <div class="display-area">
-            <h1 id="compliment-text">You're about to feel awesome.</h1>
+        <div class="content-area">
+            <h1 id="display-text">Ready for a surprise?</h1>
+            <p id="punchline-text"></p>
         </div>
-
-        <button id="get-compliment-btn" class="btn-generate">
-            Boost My Mood!
-        </button>
     </main>
+
+    <div class="controls">
+        <button id="compliment-btn" class="btn btn-compliment">Compliment</button>
+        <button id="joke-btn" class="btn btn-joke">Joke</button>
+    </div>
 
     <script>
         const compliments = [
             "You’re like the ‘skip intro’ button on Netflix. Pure joy.",
             "If you were a vegetable, you’d be a 'cute-cumber.'",
-            "You’re even better than a triple-scoop ice cream cone. With sprinkles.",
+            "You’re even better than a triple-scoop ice cream cone.",
             "I bet you’re the person everyone wants on their trivia team.",
-            "You have the kind of energy that makes people want to high-five random strangers.",
+            "You have the energy that makes people want to high-five strangers.",
             "You’re smarter than Google and way more attractive.",
-            "You’re like a high-speed Wi-Fi connection in a world of dial-up.",
+            "You’re like high-speed Wi-Fi in a world of dial-up.",
             "Is it even legal to be this awesome?",
-            "Your brain is fascinating. Like, documentary-worthy fascinating.",
-            "You're the person people think of when they hear 'good vibes only'.",
+            "Your brain is fascinating. Like, documentary-worthy.",
+            "You're the person people think of when they hear 'good vibes'.",
             "If you were a fruit, you'd be a fine-apple.",
             "You're like a cool breeze on a humid day.",
             "You have impeccable taste in everything.",
             "You’re the human equivalent of a Saturday morning.",
-            "I’d share my last slice of pizza with you. That's a big deal.",
+            "I’d share my last slice of pizza with you.",
             "You’re more fun than a ball pit full of puppies.",
-            "Your jokes are so funny they should come with a warning label.",
-            "You’re that one person who actually reads the terms and conditions. Legend.",
+            "Your jokes are so funny they need a warning label.",
+            "You’re that one person who actually reads the terms and conditions.",
             "You have a great soul.",
-            "You’re like the fancy soap people keep for guests but never use.",
-            "Your smile is contagious—in a good, non-medical way.",
+            "You’re like the fancy soap people keep for guests.",
+            "Your smile is contagious—in a good way.",
             "If being awesome was a crime, you'd be doing life.",
             "You’re the main character. Everyone else is just an NPC.",
             "You make ordinary things feel extraordinary.",
@@ -213,131 +226,154 @@
             "You make the rest of us look like we’re trying too hard.",
             "You are a limited edition. There’s only one of you!",
             "I’d trust you with my Wi-Fi password.",
-            "You have a heart of gold (and probably some chocolate too).",
+            "You have a heart of gold (and probably some chocolate).",
             "You’re like the fresh side of the pillow.",
             "You’re a literal ray of light.",
             "You’re the MVP of being a human being.",
             "Your creative mind is a national treasure.",
-            "You handle 'adulting' with such grace. How?",
+            "You handle 'adulting' with such grace.",
             "You’re the reason someone smiled today.",
             "You have a very pleasing facial symmetry.",
-            "You’re as sweet as a doughnut, but without the calories.",
+            "You’re sweet as a doughnut, without the calories.",
             "You’re like a dictionary—you add meaning to my life.",
             "If you were a candle, the scent would be 'Pure Success'.",
             "You’re a star, and the world is your stage.",
-            "You're more legendary than a unicorn.",
-            "You could survive a zombie apocalypse easily.",
-            "Your style is so on point it hurts.",
-            "You’re the best thing since sliced bread. No, better.",
-            "You make me want to be a better person, or at least a cooler one.",
-            "You’re the 'and' in 'bacon and eggs'. Essential.",
-            "Your laugh is my favorite soundtrack.",
-            "You have a way of making people feel seen.",
-            "You’re basically a human 5-star review.",
-            "You’re as reliable as a Swiss watch.",
-            "You’re the spark that starts the fire.",
-            "You’re like a rainbow after a very annoying rainstorm.",
-            "You are 100% organic, grass-fed awesomeness.",
-            "You’re the secret ingredient in the recipe of life.",
-            "You’re a wizard, but without the weird hat.",
-            "You have the patience of a saint (or someone with really slow internet).",
-            "You’re the beat in the heart of the world.",
-            "You're like a really good plot development.",
-            "You’re a masterclass in being cool.",
-            "Your eyes have a literal sparkle. How do you do that?",
-            "You’re more refreshing than a cold lemonade.",
-            "You’re the upgrade we all needed.",
-            "You’re a work of art. The Louvre is calling.",
-            "You’re like finding a $20 bill in your pocket.",
-            "You are the definition of 'killing it'.",
-            "You’re as charming as a Disney prince/princess.",
-            "You’re the glue that holds everything together.",
-            "You’re like the first snow of winter (the pretty kind).",
-            "You are a bold font in a world of italics.",
-            "You’re the personification of a 'Good Morning' text.",
-            "You have a vibe that can't be bought.",
-            "You’re the 'Add to Cart' button of people.",
-            "You’re more vibrant than a box of 64 crayons.",
-            "You’re the high score in the game of life.",
-            "You’re like a fresh pair of socks. So satisfying.",
-            "You are the human version of a cozy fireplace.",
-            "You have a spirit that can't be tamed.",
-            "You’re a whole mood, and it’s a great one.",
-            "You’re the disco ball at every party.",
-            "You’re like a perfectly timed joke.",
-            "You make everyone’s day 10% brighter just by being there.",
-            "You’re a cosmic masterpiece.",
-            "You’re the hero we need right now.",
-            "You’re like a pop of color in a black and white movie.",
-            "You have the wisdom of a very chill turtle.",
-            "You’re a total trendsetter.",
-            "You’re the reason unicorns believe in humans.",
-            "You’re the 'extra' in 'extraordinary'.",
-            "You are a beacon of hope and snacks.",
-            "You’re the best version of yourself, and it’s amazing.",
-            "You’re simply the best."
+            "You're more legendary than a unicorn."
         ];
 
-        const textDisplay = document.getElementById('compliment-text');
-        const generateBtn = document.getElementById('get-compliment-btn');
+        const jokes = [
+            { setup: "Why don't scientists trust atoms?", punchline: "Because they make up everything!" },
+            { setup: "What do you call a fake noodle?", punchline: "An Impasta!" },
+            { setup: "Why did the scarecrow win an award?", punchline: "Because he was outstanding in his field!" },
+            { setup: "What do you call a bear with no teeth?", punchline: "A gummy bear!" },
+            { setup: "Why can't your nose be 12 inches long?", punchline: "Because then it would be a foot!" },
+            { setup: "How does a penguin build its house?", punchline: "Igloos it together!" },
+            { setup: "What did the ocean say to the beach?", punchline: "Nothing, it just waved." },
+            { setup: "Why did the gym close down?", punchline: "It just wasn't working out!" },
+            { setup: "What do you call a sleeping dinosaur?", punchline: "A dino-snore!" },
+            { setup: "Why did the bicycle fall over?", punchline: "Because it was two-tired!" },
+            { setup: "What do you call a snowman with a six pack?", punchline: "An abdominal snowman!" },
+            { setup: "Why was the math book sad?", punchline: "It had too many problems." },
+            { setup: "What kind of shoes do ninjas wear?", punchline: "Sneakers!" },
+            { setup: "Why did the cookie go to the doctor?", punchline: "Because he was feeling crumb-y." },
+            { setup: "What do you call a belt with a watch on it?", punchline: "A waist of time!" },
+            { setup: "What do you call an alligator in a vest?", punchline: "An investigator!" },
+            { setup: "How do you organize a space party?", punchline: "You planet!" },
+            { setup: "Why did the banana go to the doctor?", punchline: "He wasn't peeling well!" },
+            { setup: "What do you call a fly without wings?", punchline: "A walk!" },
+            { setup: "Why was 6 afraid of 7?", punchline: "Because 7 8 9!" },
+            { setup: "What do you call a boomerang that doesn’t come back?", punchline: "A stick." },
+            { setup: "What’s orange and sounds like a parrot?", punchline: "A carrot!" },
+            { setup: "What do you call a pig that knows karate?", punchline: "A pork chop!" },
+            { setup: "Why can't a bicycle stand on its own?", punchline: "It's two-tired." },
+            { setup: "Where do fish keep their money?", punchline: "In a river bank!" },
+            { setup: "Why are ghosts such bad liars?", punchline: "Because you can see right through them!" },
+            { setup: "What do you call a toothless bear?", punchline: "A gummy bear!" },
+            { setup: "How do celebrities stay cool?", punchline: "They have many fans!" },
+            { setup: "What do you call a dog that can do magic?", punchline: "A Labracadabrador!" },
+            { setup: "Why did the melon jump into the lake?", punchline: "It wanted to be a water-melon!" },
+            { setup: "What starts with T, ends with T, and has T in it?", punchline: "A teapot!" },
+            { setup: "Why don't skeletons fight each other?", punchline: "They don't have the guts!" },
+            { setup: "What do you call a farm that grows jokes?", punchline: "A laughing stock!" },
+            { setup: "How does the moon cut his hair?", punchline: "Eclipse it!" },
+            { setup: "Why did the tomato turn red?", punchline: "It saw the salad dressing!" },
+            { setup: "What has legs but cannot walk?", punchline: "A chair!" },
+            { setup: "What kind of tree fits in your hand?", punchline: "A palm tree!" },
+            { setup: "What do you call a factory that makes okay products?", punchline: "A satisfactory!" },
+            { setup: "Why did the golfer bring two pairs of pants?", punchline: "In case he got a hole in one!" },
+            { setup: "What did the grape do when he got stepped on?", punchline: "He let out a little wine!" },
+            { setup: "What do you call a man with no body and no nose?", punchline: "Nobody knows!" },
+            { setup: "Why couldn't the leopard play hide and seek?", punchline: "Because he was always spotted!" },
+            { setup: "What do you call cheese that isn't yours?", punchline: "Nacho cheese!" },
+            { setup: "Why did the student eat his homework?", punchline: "Because his teacher said it was a piece of cake!" },
+            { setup: "What do you call a cold dog?", punchline: "A chili dog!" },
+            { setup: "Why did the robot go on vacation?", punchline: "He needed to recharge his batteries!" },
+            { setup: "What do you call a pile of cats?", punchline: "A meow-ntain!" },
+            { setup: "Why did the music teacher need a ladder?", punchline: "To reach the high notes!" },
+            { setup: "What do you call a dinosaur that is a noisy sleeper?", punchline: "A Tyranno-snore-us!" },
+            { setup: "Why are elephants so wrinkly?", punchline: "Because they are too big to iron!" }
+        ];
+
+        const colors = ['#FF6B6B', '#4ECDC4', '#FFD166', '#A29BFE', '#FD79A8', '#55E6C1', '#F0932B', '#EB4D4B'];
+        const emojis = ['🌟', '🔥', '💎', '🎨', '🚀', '🌈', '🍀', '🎈', '🍕', '🐱', '🎸', '🍦', '🍩', '🦊', '⚡', '👑'];
+
+        const card = document.getElementById('card');
+        const textDisplay = document.getElementById('display-text');
+        const punchlineDisplay = document.getElementById('punchline-text');
+        const pipTR = document.getElementById('pip-tr');
+        const pipBL = document.getElementById('pip-bl');
+        
+        const compBtn = document.getElementById('compliment-btn');
+        const jokeBtn = document.getElementById('joke-btn');
+
         let lastIndex = -1;
 
-        // --- Confetti / Emoji Effect ---
-        function createBurst() {
-            const emojis = ['💖', '✨', '🎈', '🔥', '🌈', '🍭', '⭐'];
-            const container = document.querySelector('.app-container');
+        // Function to update the card visuals (color and emoji) once per "deal"
+        function updateCardVisuals() {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
             
-            for (let i = 0; i < 12; i++) {
-                const span = document.createElement('span');
-                span.className = 'emoji-burst';
-                span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                
-                const x = (Math.random() - 0.5) * 300;
-                const y = (Math.random() - 0.5) * 300;
-                
-                span.style.setProperty('--x', `${x}px`);
-                span.style.setProperty('--y', `${y}px`);
-                span.style.left = '50%';
-                span.style.top = '50%';
-                
-                container.appendChild(span);
-                setTimeout(() => span.remove(), 800);
+            // Set visuals
+            pipTR.style.backgroundColor = randomColor;
+            pipBL.style.backgroundColor = randomColor;
+            pipTR.textContent = randomEmoji;
+            pipBL.textContent = randomEmoji;
+
+            // Trigger the deal animation
+            card.classList.remove('flip-anim');
+            void card.offsetWidth; // Trigger reflow to restart animation
+            card.classList.add('flip-anim');
+        }
+
+        function getCompliment() {
+            punchlineDisplay.classList.remove('reveal');
+            punchlineDisplay.textContent = "";
+            
+            let idx;
+            do { idx = Math.floor(Math.random() * compliments.length); } while (idx === lastIndex);
+            lastIndex = idx;
+
+            // Update card appearance once for this specific card
+            updateCardVisuals();
+            textDisplay.textContent = compliments[idx];
+        }
+
+        function getJoke() {
+            let idx = Math.floor(Math.random() * jokes.length);
+            const joke = jokes[idx];
+            
+            punchlineDisplay.classList.remove('reveal');
+            
+            // Update card appearance once for this specific card
+            updateCardVisuals();
+            
+            textDisplay.textContent = joke.setup;
+            punchlineDisplay.textContent = joke.punchline;
+            
+            // Wait for the punchline reveal
+            setTimeout(() => {
+                punchlineDisplay.classList.add('reveal');
+            }, 2000);
+        }
+
+        // Floating Background Particles
+        function createParticles() {
+            for (let i = 0; i < 20; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 50 + 10;
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
+                p.style.left = `${Math.random() * 100}vw`;
+                p.style.top = `${Math.random() * 100}vh`;
+                p.style.opacity = Math.random() * 0.3;
+                document.body.appendChild(p);
             }
         }
 
-        // --- Background Sparkle Effect ---
-        function createBackgroundSparkle() {
-            const sparkle = document.createElement('div');
-            sparkle.className = 'sparkle';
-            sparkle.innerHTML = '✦';
-            sparkle.style.left = Math.random() * 100 + 'vw';
-            sparkle.style.top = '110vh';
-            sparkle.style.color = 'white';
-            sparkle.style.fontSize = (Math.random() * 10 + 10) + 'px';
-            document.body.appendChild(sparkle);
-            setTimeout(() => sparkle.remove(), 4000);
-        }
-
-        function generateNewCompliment() {
-            let randomIndex;
-            do {
-                randomIndex = Math.floor(Math.random() * compliments.length);
-            } while (randomIndex === lastIndex);
-
-            lastIndex = randomIndex;
-            
-            textDisplay.classList.remove('pop-in');
-            void textDisplay.offsetWidth; // Reflow
-            
-            textDisplay.textContent = compliments[randomIndex];
-            textDisplay.classList.add('pop-in');
-            
-            createBurst();
-        }
-
-        // Initialize
-        setInterval(createBackgroundSparkle, 300);
-        generateBtn.addEventListener('click', generateNewCompliment);
+        compBtn.addEventListener('click', getCompliment);
+        jokeBtn.addEventListener('click', getJoke);
+        createParticles();
     </script>
 </body>
 </html>
